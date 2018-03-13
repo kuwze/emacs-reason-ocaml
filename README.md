@@ -3,6 +3,7 @@ A simple setup for people who want to use ReasonML and OCaml with Emacs
 
 This is supposed to be a simple Emacs configuration file to be mixed with your own. The only liberties I took was in using Helm and adding S-Expression syntax highlighting to make editing .elisp files easier. Helm is not required for this project to work.
 
+
 ## steps to follow
 1. Rename your `.emacs.d` folder to something like `emacs-backup`
 1. Run `git clone https://github.com/kuwze/emacs-reason-ocaml.git ~/.emacs.d`
@@ -11,7 +12,6 @@ This is supposed to be a simple Emacs configuration file to be mixed with your o
 1. When it comes to the .merlin file (which is required for merlin to work) you either write you own (if you are doing OCaml) or have the bucklescript compiler generate one for you (the example `bsconfig.json` below will auto generate one for you).
 
 > `tree example-reasonml-application`
-
 ```
 ├── bsconfig.json
 ├── reasonml
