@@ -102,24 +102,20 @@
 ;; <helm------------------------------------------------------------------------
 
 ;; ocaml>-----------------------------------------------------------------------
-(use-package ocp-indent
-  :load-path "~/.opam/4.06.1/share/emacs/site-lisp")
-
-(use-package tuareg
-  :ensure t
-  :config
-  ;; (setq utop-command "opam config exec -- utop -emacs")
-  ;; (let* ((utop-bin (setq utop-command "opam config exec -- utop -emacs")))
-  ;;   (setq-local utop-command utop-bin))
-  (setq auto-mode-alist 
-	(append '(("\\.ml[ily]?$" . tuareg-mode)
-		  ("\\.topml$" . tuareg-mode))
-		auto-mode-alist)))
-
 (let ((opam-share (ignore-errors (car (process-lines "opam" "config" "var" "share")))))
   (when (and opam-share (file-directory-p opam-share))
     (add-to-list 'load-path (expand-file-name "emacs/site-lisp" opam-share))))
 
+(use-package ocp-indent)
+
+(use-package tuareg
+  :ensure t
+  :config
+  (add-hook 'before-save-hook 'ocp-indent-buffer nil t)
+  (setq auto-mode-alist 
+	(append '(("\\.ml[ily]?$" . tuareg-mode)
+		  ("\\.topml$" . tuareg-mode))
+		auto-mode-alist)))
 ;; <ocaml-----------------------------------------------------------------------
 
 ;; reasonml>--------------------------------------------------------------------
@@ -131,8 +127,6 @@
 (quelpa '(reason-mode :repo "reasonml-editor/reason-mode" :fetcher github :stable t))
 (use-package reason-mode
   :config
-  ;; (let* ((utop-bin (shell-cmd "which rtop")))
-  ;;     (setq-local utop-command (concat utop-bin " -emacs")))
   (let* ((refmt-bin (shell-cmd "which refmt")))
     (when refmt-bin
       (setq refmt-command refmt-bin)))
@@ -191,6 +185,8 @@
 
 ;; <utop------------------------------------------------------------------------
 
+;; company>---------------------------------------------------------------------
+
 (use-package company
   :ensure t
   :config
@@ -203,3 +199,29 @@
   :config
   (company-quickhelp-mode 1)
   (define-key company-active-map (kbd "C-c h") #'company-quickhelp-manual-begin))
+
+;; <company---------------------------------------------------------------------
+
+;; flycheck>--------------------------------------------------------------------
+
+(use-package flycheck
+  :ensure t
+  :config
+  (global-flycheck-mode))
+
+(use-package flycheck-popup-tip
+  :ensure t
+  :config
+  (flycheck-popup-tip-mode))
+
+(use-package flycheck-ocaml
+  :ensure t
+  :config
+  (with-eval-after-load 'merlin
+    ;; disable Merlin's own error checking
+    (setq merlin-error-after-save nil)    
+    ;; enable Flycheck checker
+    (flycheck-ocaml-setup)))
+
+
+;; <flycheck--------------------------------------------------------------------

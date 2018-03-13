@@ -1,10 +1,13 @@
 # emacs-reason-ocaml
 A simple setup for people who want to use ReasonML and OCaml with Emacs
 
-This is supposed to be a simple Emacs configuration file to be mixed with your own. The only liberties I took was in using Helm and adding S-Expression syntax highlighting to make editing .elisp files easier. Helm is not required for this project to work.
+This is supposed to be a simple Emacs configuration file to be mixed with your own. The only liberties I took was in using `helm`, flycheck-support (via `flycheck-ocaml`) and adding S-Expression syntax highlighting to make editing .elisp files easier. `helm` and `flycheck-ocaml` are not required for this project to work.
 
 
 ## steps to follow
+1. [Install reason-cli](https://github.com/reasonml/reason-cli)
+1. Install OCaml via your package manager (`sudo apt-get install opam`)
+1. Install what you need (`opam switch 4.06.1 && opam install merlin ocp-indent`)
 1. Rename your `.emacs.d` folder to something like `emacs-backup`
 1. Run `git clone https://github.com/kuwze/emacs-reason-ocaml.git ~/.emacs.d`
 1. Start Emacs
