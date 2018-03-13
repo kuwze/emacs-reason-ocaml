@@ -11,6 +11,7 @@ This is supposed to be a simple Emacs configuration file to be mixed with your o
 1. When it comes to the .merlin file (which is required for merlin to work) you either write you own (if you are doing OCaml) or have the bucklescript compiler generate one for you (the example `bsconfig.json` below will auto generate one for you).
 
 > `tree example-reasonml-application`
+
 ```
 ├── bsconfig.json
 ├── reasonml
@@ -22,6 +23,7 @@ This is supposed to be a simple Emacs configuration file to be mixed with your o
 ```
 
 > `cat bsconfig.json`
+
 ```javascript
 {
     "name": "example-reasonml-application",
