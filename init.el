@@ -1,10 +1,10 @@
 ;; note:
 ;; which ocamlmerlin should spit out:
-;; /home/user_name/.nvm/versions/node/v9.6.1/bin/ocamlmerlin
+;; /home/`user_name`/.nvm/versions/node/`some-version`/bin/ocamlmerlin
 ;; and in `M-x ielm` evaluating the following:
 ;; (expand-file-name "emacs/site-lisp" (car (process-lines "opam" "config" "var" "share")))
 ;; should spit out:
-;; "/home/user_name/.opam/4.06.1/share/emacs/site-lisp"
+;; "/home/`user_name`/.opam/`some-version`/share/emacs/site-lisp"
 
 
 ;; main>------------------------------------------------------------------------
@@ -58,13 +58,39 @@
   :ensure t
   :config
   (helm-mode 1)
-
   (helm-popup-tip-mode 1)
-  (global-set-key (kbd "M-x") #'helm-M-x)
-  (global-set-key (kbd "C-s") #'helm-occur)
+  (helm-autoresize-mode t)
+  (setq helm-autoresize-min-height 40)
+
+  (setq helm-M-x-fuzzy-match t)
+  (setq helm-buffers-fuzzy-matching t)
+  (setq helm-recentf-fuzzy-match t)
+  (setq helm-lisp-fuzzy-completion t)
+  
+  (require 'helm-eshell)
+  (add-hook 'eshell-mode-hook
+	    #'(lambda ()
+		(define-key eshell-mode-map (kbd "M-l")  'helm-eshell-history)))
+  
+
+  ;; (global-set-key (kbd "C-s") #'helm-occur) ; using helm-swoop now
   (global-set-key (kbd "C-c b") #'helm-filtered-bookmarks)
+  (global-set-key (kbd "C-c C-b") #'helm-filtered-bookmarks) ; because I am an idiot
   (global-set-key (kbd "C-x C-f") #'helm-find-files)
   (global-set-key (kbd "C-x b") #'helm-mini)
+  (global-set-key (kbd "C-x C-b") 'helm-buffers-list)
+  (global-set-key (kbd "C-h f") 'helm-apropos)
+  (global-set-key (kbd "C-h r") 'helm-info-emacs)
+  (global-set-key (kbd "C-h C-l") 'helm-locate-library)
+  (global-set-key (kbd "C-c f") 'helm-recentf)
+  (global-set-key (kbd "C-h SPC") 'helm-all-mark-rings)
+  (global-set-key (kbd "C-c h x") 'helm-register)
+  
+  (global-set-key (kbd "M-y") 'helm-show-kill-ring)
+  (global-set-key (kbd "M-x") #'helm-M-x)
+
+  (define-key minibuffer-local-map (kbd "C-c C-l") 'helm-minibuffer-history)
+  
   (define-key helm-map [backspace] #'backward-kill-word))
 
 (use-package helm-swoop
@@ -82,6 +108,9 @@
 (use-package tuareg
   :ensure t
   :config
+  ;; (setq utop-command "opam config exec -- utop -emacs")
+  ;; (let* ((utop-bin (setq utop-command "opam config exec -- utop -emacs")))
+  ;;   (setq-local utop-command utop-bin))
   (setq auto-mode-alist 
 	(append '(("\\.ml[ily]?$" . tuareg-mode)
 		  ("\\.topml$" . tuareg-mode))
@@ -89,9 +118,7 @@
 
 (let ((opam-share (ignore-errors (car (process-lines "opam" "config" "var" "share")))))
   (when (and opam-share (file-directory-p opam-share))
-    (add-to-list 'load-path (expand-file-name "emacs/site-lisp" opam-share))
-    (autoload 'merlin-mode "merlin" nil t nil)
-    (setq merlin-command 'opam)))
+    (add-to-list 'load-path (expand-file-name "emacs/site-lisp" opam-share))))
 
 ;; <ocaml-----------------------------------------------------------------------
 
@@ -104,6 +131,8 @@
 (quelpa '(reason-mode :repo "reasonml-editor/reason-mode" :fetcher github :stable t))
 (use-package reason-mode
   :config
+  ;; (let* ((utop-bin (shell-cmd "which rtop")))
+  ;;     (setq-local utop-command (concat utop-bin " -emacs")))
   (let* ((refmt-bin (shell-cmd "which refmt")))
     (when refmt-bin
       (setq refmt-command refmt-bin)))
@@ -121,6 +150,8 @@
   (merlin-command 'opam)
   (merlin-completion-with-doc t)
   (company-quickhelp-mode t)
+  :config
+  (autoload 'merlin-mode "merlin" nil t nil)
   :bind (:map merlin-mode-map
               ("M-." . merlin-locate)
               ("M-," . merlin-pop-stack)
@@ -137,13 +168,26 @@
 ;; <merlin----------------------------------------------------------------------
 
 ;; utop>------------------------------------------------------------------------
-;; (use-package utop
-;;   :config
-;;   (setq utop-command "opam config exec -- rtop -emacs")
-;;   (add-hook 'reason-mode-hook #'utop-minor-mode)
-;;   :hook
-;;   (tuareg-mode . utop-minor-mode)
-;;   (reason-mode . utop-minor-mode))
+(use-package utop
+  :config
+  (defun utop-opam-utop () (progn
+			     (setq utop-command "opam config exec -- utop -emacs")
+			     #'utop-minor-mode))
+  (defun utop-reason-cli-rtop () (progn
+				     (setq utop-command (concat (shell-cmd "which rtop") " -emacs"))
+				     (setq utop-prompt 'reason/rtop-prompt)
+				     #'utop-minor-mode))
+  :hook
+  (tuareg-mode . utop-opam-utop)
+  ;;  (reason-mode . utop-minor-mod)
+  (reason-mode . utop-reason-cli-rtop)
+  )
+
+(defun reason/rtop-prompt ()
+  "The rtop prompt function."
+  (let ((prompt (format "rtop[%d]> " utop-command-number)))
+    (add-text-properties 0 (length prompt) '(face utop-prompt) prompt)
+prompt))
 ;; <utop------------------------------------------------------------------------
 
 (use-package company
