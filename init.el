@@ -168,26 +168,27 @@
 ;; <merlin----------------------------------------------------------------------
 
 ;; utop>------------------------------------------------------------------------
-(use-package utop
-  :config
-  (defun utop-opam-utop () (progn
-			     (setq utop-command "opam config exec -- utop -emacs")
-			     #'utop-minor-mode))
-  (defun utop-reason-cli-rtop () (progn
-				     (setq utop-command (concat (shell-cmd "which rtop") " -emacs"))
-				     (setq utop-prompt 'reason/rtop-prompt)
-				     #'utop-minor-mode))
-  :hook
-  (tuareg-mode . utop-opam-utop)
-  ;;  (reason-mode . utop-minor-mod)
-  (reason-mode . utop-reason-cli-rtop)
-  )
+
 
 (defun reason/rtop-prompt ()
   "The rtop prompt function."
   (let ((prompt (format "rtop[%d]> " utop-command-number)))
     (add-text-properties 0 (length prompt) '(face utop-prompt) prompt)
-prompt))
+    prompt))
+
+(use-package utop
+  :config
+  (defun utop-opam-utop () (progn
+			     (setq-local utop-command "opam config exec -- utop -emacs")
+			     'utop-minor-mode))
+  (defun utop-reason-cli-rtop () (progn
+				     (setq-local utop-command (concat (shell-cmd "which rtop") " -emacs"))
+				     (setq-local utop-prompt 'reason/rtop-prompt)
+				     'utop-minor-mode))
+  :hook
+  (tuareg-mode . utop-opam-utop)
+  (reason-mode . utop-reason-cli-rtop))
+
 ;; <utop------------------------------------------------------------------------
 
 (use-package company
