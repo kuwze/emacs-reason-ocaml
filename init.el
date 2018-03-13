@@ -204,6 +204,8 @@
 
 ;; flycheck>--------------------------------------------------------------------
 
+;; someday these will play nicely with both reasonml and ocaml...
+
 (use-package flycheck
   :ensure t
   :config
@@ -217,11 +219,12 @@
 (use-package flycheck-ocaml
   :ensure t
   :config
-  (with-eval-after-load 'merlin
-    ;; disable Merlin's own error checking
-    (setq merlin-error-after-save nil)    
-    ;; enable Flycheck checker
-    (flycheck-ocaml-setup)))
+  (add-hook 'tuareg-mode-hook
+	    (lambda ()
+	      ;; disable Merlin's own error checking
+	      (setq-local merlin-error-after-save nil)    
+	      ;; enable Flycheck checker
+	      (flycheck-ocaml-setup))))
 
 
 ;; <flycheck--------------------------------------------------------------------
