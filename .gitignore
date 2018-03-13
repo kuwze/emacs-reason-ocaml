@@ -1,3 +1,9 @@
+auto-save-list/*
+elpa/*
+quelpa/*
+network-security.data
+recentf
+
 # Compiled
 *.elc
 
