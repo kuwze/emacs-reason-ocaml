@@ -11,35 +11,36 @@ and in `M-x ielm` evaluating the following:
 should spit out:
 "/home/`user_name`/.opam/`some-version`/share/emacs/site-lisp"
 
-remember, C-h k is how you find out what a key-chord does
+| Keybinding | Module                | Function                     |
+|------------+-----------------------+------------------------------|
+| C-h k      | help                  | describe-key                 |
+| M-<right>  | auto-highlight-symbol | next occurrence              |
+| M-<left>   | helm                  | previous occurrence          |
+| C-c b      | helm                  | helm-filtered-bookmarks      |
+| C-x C-f    | helm                  | helm-find-files              |
+| C-x f      | helm                  | helm-find-files              |
+| C-x b      | helm                  | helm-mini                    |
+| C-x C-b    | helm                  | helm-buffers-list            |
+| C-h f      | helm                  | helm-apropos                 |
+| C-h r      | helm                  | helm-info-emacs              |
+| C-h C-l    | helm                  | helm-locate-library          |
+| C-c f      | helm                  | helm-recentf                 |
+| C-h SPC    | helm                  | helm-all-mark-rings          |
+| C-c h x    | helm                  | helm-register                |
+| M-y        | helm                  | helm-show-kill-ring          |
+| M-x        | helm                  | helm-M-x                     |
+| C-c C-l    | helm                  | helm-minibuffer-history      |
+| C-s        | helm-swoop            | helm-swoop-without-pre-input |
+| C-r        | helm-swoop            | helm-previous-line           |
+| C-s        | helm-swoop            | helm-next-line               |
+| M-.        | merlin                | merlin-locate                |
+| M-,        | merlin                | merlin-pop-stack             |
+| C-c C-o    | merlin                | merlin-occurrences           |
+| C-c C-j    | merlin                | merlin-jump                  |
+| C-c i      | merlin                | merlin-locate-ident          |
+| C-c C-e    | merlin                | merlin-edit-occurrences      |
 
-keybindings in this file:
-M-<right>/M-<left> -> auto-highlight-symbol -> next/previous occurrence
-C-c b --------------> helm ------------------> helm-filtered-bookmarks
-C-x C-f ------------> helm ------------------> helm-find-files
-C-x f --------------> helm ------------------> helm-find-files
-C-x b --------------> helm ------------------> helm-mini
-C-x C-b ------------> helm ------------------> helm-buffers-list
-C-h f --------------> helm ------------------> helm-apropos
-C-h r --------------> helm ------------------> helm-info-emacs
-C-h C-l ------------> helm ------------------> helm-locate-library
-C-c f --------------> helm ------------------> helm-recentf
-C-h SPC ------------> helm ------------------> helm-all-mark-rings
-C-c h x ------------> helm ------------------> helm-register
-M-y ----------------> helm ------------------> helm-show-kill-ring
-M-x ----------------> helm ------------------> helm-M-x
-C-c C-l ------------> helm ------------------> helm-minibuffer-history
-C-s ----------------> helm-swoop ------------> helm-swoop-without-pre-input
-C-r ----------------> helm-swoop ------------> helm-previous-line
-C-s ----------------> helm-swoop ------------> helm-next-line
-M-. ----------------> merlin ----------------> merlin-locate
-M-, ----------------> merlin ----------------> merlin-pop-stack
-C-c C-o ------------> merlin ----------------> merlin-occurrences
-C-c C-j -> merlin :: merlin-jump
-C-c i -> merlin :: merlin-locate-ident
-C-c C-e -> merlin :: merlin-iedit-occurrences))
-
-** main>--------------------------------------------------------------------------
+** main
    #+BEGIN_SRC emacs-lisp
    (eval-when-compile
    (require 'cl))
@@ -87,9 +88,8 @@ C-c C-e -> merlin :: merlin-iedit-occurrences))
 
    (setq ring-bell-function 'ignore)
    #+END_SRC
-   <main---------------------------------------------------------------------------
 
-** packages>-----------------------------------------------------------------------
+** packages
    #+BEGIN_SRC emacs-lisp
    (require 'package)
    (setq package-enable-at-startup nil)
@@ -111,10 +111,8 @@ C-c C-e -> merlin :: merlin-iedit-occurrences))
        (eval-buffer)))
 
    #+END_SRC 
-   <packages-----------------------------------------------------------------------
 
-
-** path>---------------------------------------------------------------------------
+** path
    #+BEGIN_SRC emacs-lisp
    (if (string-equal system-type "windows-nt")
        (progn
@@ -128,9 +126,8 @@ C-c C-e -> merlin :: merlin-iedit-occurrences))
 	 (when (memq window-system '(mac ns x))
 	   (exec-path-from-shell-initialize)))))
    #+END_SRC
-   <path---------------------------------------------------------------------------
 
-** helm>---------------------------------------------------------------------------
+** helm
    #+BEGIN_SRC emacs-lisp
    (use-package helm
      :ensure t
@@ -178,9 +175,8 @@ C-c C-e -> merlin :: merlin-iedit-occurrences))
      (define-key helm-swoop-map (kbd "C-r") 'helm-previous-line)
      (define-key helm-swoop-map (kbd "C-s") 'helm-next-line))
    #+END_SRC
-   <helm---------------------------------------------------------------------------
 
-** ocaml>--------------------------------------------------------------------------
+** ocaml
    #+BEGIN_SRC emacs-lisp
    (let ((opam-share (ignore-errors (car (process-lines "opam" "config" "var" "share")))))
      (when (and opam-share (file-directory-p opam-share))
@@ -198,9 +194,8 @@ C-c C-e -> merlin :: merlin-iedit-occurrences))
 		   auto-mode-alist)))
 
    #+END_SRC
-   <ocaml--------------------------------------------------------------------------
 
-** reasonml>-----------------------------------------------------------------------
+** reasonml
    #+BEGIN_SRC emacs-lisp
    (defun shell-cmd (cmd)
      "Returns the stdout output of a shell command or nil if the command returned
@@ -220,9 +215,8 @@ C-c C-e -> merlin :: merlin-iedit-occurrences))
 	(setq-local merlin-command (shell-cmd "which ocamlmerlin"))
 	(merlin-mode))))
    #+END_SRC
-   <reasonml-----------------------------------------------------------------------
 
-** merlin>-------------------------------------------------------------------------
+** merlin
    #+BEGIN_SRC emacs-lisp
    (use-package merlin
      :custom
@@ -244,9 +238,8 @@ C-c C-e -> merlin :: merlin-iedit-occurrences))
      (tuareg-mode . merlin-mode)
      (caml-mode-hook . merlin-mode))
    #+END_SRC
-   <merlin-------------------------------------------------------------------------
 
-** utop>---------------------------------------------------------------------------
+** utop
    #+BEGIN_SRC emacs-lisp
    (defun reason/rtop-prompt ()
      "The rtop prompt function."
@@ -269,9 +262,8 @@ C-c C-e -> merlin :: merlin-iedit-occurrences))
      (tuareg-mode . utop-opam-utop)
      (reason-mode . utop-reason-cli-rtop))
    #+END_SRC
-   <utop---------------------------------------------------------------------------
 
-** company>------------------------------------------------------------------------
+** company
    #+BEGIN_SRC emacs-lisp
    (use-package company
      :ensure t
@@ -286,9 +278,8 @@ C-c C-e -> merlin :: merlin-iedit-occurrences))
      (company-quickhelp-mode 1)
      (define-key company-active-map (kbd "C-c h") #'company-quickhelp-manual-begin))
    #+END_SRC
-   <company------------------------------------------------------------------------
 
-** flycheck>-----------------------------------------------------------------------
+** flycheck
    #+BEGIN_SRC emacs-lisp
    ;; someday these will play nicely with both reasonml and ocaml...
 
