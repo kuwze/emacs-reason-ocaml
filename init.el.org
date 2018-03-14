@@ -1,22 +1,29 @@
-* init
+* initialization
+** to do
+   leverage use-package's :hook parameter
 ** info.
+the inspiration for trying an org-mode literate Emacs file came from here:
+https://github.com/r0man/.emacs.d
 
-Hide the scroll bar.
+this is an opinionated yet minimal setup for someone who wants to try using
+Emacs for writing OCaml or ReasonML code. One defining characteristic of this
+project is the fact that it works with Merlin from both opam and reason-cli, and
+it chooses the version based off of the type of file.
 
-note:
+note: this could cause an issue for people who write bucklescript, as that code
+will be checked against opam's merlin and not the one from reason-cli. I am
+unsure of how to tell the difference between bucklescript and ocaml code
+programmatically.
 
-`which ocamlmerlin` should spit out:
+to use this you must:
+1. *install merlin and ocp-indent:*
+   ~opam install merlin ocp-indent~
+2. *install reason-cli via npm/yarn:*
+   ~npm install -g reason-cli@3.1.0-linux~
+   or
+   ~npm install -g reason-cli@3.1.0-darwin~
 
-/home/`user_name`/.nvm/versions/node/`some-version`/bin/ocamlmerlin
-
-and in `M-x ielm` evaluating the following:
-
-`(expand-file-name "emacs/site-lisp" (car (process-lines "opam" "config" "var" "share")))`
-
-should spit out:
-
-"/home/`user_name`/.opam/`some-version`/share/emacs/site-lisp"
-
+* setup
 ** keybindings
    | Keybinding | Module                | Function                     |
    |------------+-----------------------+------------------------------|
@@ -47,24 +54,24 @@ should spit out:
    | C-c i      | merlin                | merlin-locate-ident          |
    | C-c C-e    | merlin                | merlin-edit-occurrences      |
 ** main
-   Use Common Lisp features in Emacs Lisp.
+   use Common Lisp features in Emacs Lisp.
    #+BEGIN_SRC emacs-lisp
    (eval-when-compile 
      (require 'cl)
      (require 'cl-lib))
    #+END_SRC
 
-   Make it so that (,{,[, and " are auto paired.
+   make it so that (,{,[, and " are auto paired.
    #+BEGIN_SRC emacs-lisp
    (electric-pair-mode t)
    #+END_SRC
 
-   Make the highlighting/region selected easier to see.
+   make the highlighting/region selected easier to see.
    #+BEGIN_SRC emacs-lisp
    (set-face-attribute 'region nil :background "green")
    #+END_SRC
 
-   Make the default yes/no y/n instead
+   make the default yes/no y/n instead
    #+BEGIN_SRC emacs-lisp
    (fset 'yes-or-no-p 'y-or-n-p)
    #+END_SRC
@@ -135,11 +142,40 @@ should spit out:
 ** text
    start wrapping at 80 for text files
    #+BEGIN_SRC emacs-lisp
+   (use-package auto-dictionary
+     :ensure t
+     :init (add-hook 'flyspell-mode-hook (lambda () (auto-dictionary-mode 1))))
    (add-hook 'text-mode-hook
 	  '(lambda()
 	     (turn-on-auto-fill)
 	     (set-fill-column 80)
 	     (setq-default auto-fill-function 'do-auto-fill)))
+   #+END_SRC
+
+   use a dictionary!
+   enable flyspell in text mode
+   #+BEGIN_SRC emacs-lisp
+     (defun enable-flyspell-mode ()
+       "Enable Flyspell mode."
+       (flyspell-mode 1))
+
+     (dolist (hook '(text-mode-hook))
+       (add-hook hook 'enable-flyspell-mode))
+   #+END_SRC
+
+   enable flyspell in programming mode
+   #+BEGIN_SRC emacs-lisp
+     (defun enable-flyspell-prog-mode ()
+       "Enable Flyspell Programming mode."
+       (flyspell-prog-mode))
+
+     (dolist (hook '(prog-mode-hook))
+       (add-hook hook 'enable-flyspell-prog-mode))
+   #+END_SRC
+
+   don't print messages when checking words.
+   #+BEGIN_SRC emacs-lisp
+     (setq flyspell-issue-message-flag nil)
    #+END_SRC
 ** org-mode
    use sane defaults for org-mode
@@ -205,12 +241,19 @@ should spit out:
      (setq helm-recentf-fuzzy-match t)
      (setq helm-lisp-fuzzy-completion t)
 
+     (setq helm-mini-default-sources '(helm-source-buffers-list
+                                       helm-source-recentf
+                                       helm-source-bookmarks
+                                       helm-source-buffer-not-found))
+
+
      (require 'helm-eshell)
      (add-hook 'eshell-mode-hook
 	       #'(lambda ()
 		   (define-key eshell-mode-map (kbd "M-l")  'helm-eshell-history)))
 
 
+     ;; (define-key helm-map (kbd "<return>") 'helm-execute-persistent-action)
      ;; (global-set-key (kbd "C-s") #'helm-occur) ; using helm-swoop now
      (global-set-key (kbd "C-c b") #'helm-filtered-bookmarks)
      (global-set-key (kbd "C-c C-b") #'helm-filtered-bookmarks) ; because I am an idiot
