@@ -1,49 +1,54 @@
 * init.el
-** Scroll, tool and menu bar.
+** info.
 
 Hide the scroll bar.
 
 note:
-which ocamlmerlin should spit out:
+
+`which ocamlmerlin` should spit out:
+
 /home/`user_name`/.nvm/versions/node/`some-version`/bin/ocamlmerlin
+
 and in `M-x ielm` evaluating the following:
-(expand-file-name "emacs/site-lisp" (car (process-lines "opam" "config" "var" "share")))
+
+`(expand-file-name "emacs/site-lisp" (car (process-lines "opam" "config" "var" "share")))`
+
 should spit out:
+
 "/home/`user_name`/.opam/`some-version`/share/emacs/site-lisp"
 
-| Keybinding | Module                | Function                     |
-|------------+-----------------------+------------------------------|
-| C-h k      | help                  | describe-key                 |
-| M-<right>  | auto-highlight-symbol | next occurrence              |
-| M-<left>   | helm                  | previous occurrence          |
-| C-c b      | helm                  | helm-filtered-bookmarks      |
-| C-x C-f    | helm                  | helm-find-files              |
-| C-x f      | helm                  | helm-find-files              |
-| C-x b      | helm                  | helm-mini                    |
-| C-x C-b    | helm                  | helm-buffers-list            |
-| C-h f      | helm                  | helm-apropos                 |
-| C-h r      | helm                  | helm-info-emacs              |
-| C-h C-l    | helm                  | helm-locate-library          |
-| C-c f      | helm                  | helm-recentf                 |
-| C-h SPC    | helm                  | helm-all-mark-rings          |
-| C-c h x    | helm                  | helm-register                |
-| M-y        | helm                  | helm-show-kill-ring          |
-| M-x        | helm                  | helm-M-x                     |
-| C-c C-l    | helm                  | helm-minibuffer-history      |
-| C-s        | helm-swoop            | helm-swoop-without-pre-input |
-| C-r        | helm-swoop            | helm-previous-line           |
-| C-s        | helm-swoop            | helm-next-line               |
-| M-.        | merlin                | merlin-locate                |
-| M-,        | merlin                | merlin-pop-stack             |
-| C-c C-o    | merlin                | merlin-occurrences           |
-| C-c C-j    | merlin                | merlin-jump                  |
-| C-c i      | merlin                | merlin-locate-ident          |
-| C-c C-e    | merlin                | merlin-edit-occurrences      |
-
+** keybindings
+   | Keybinding | Module                | Function                     |
+   |------------+-----------------------+------------------------------|
+   | C-h k      | help                  | describe-key                 |
+   | M-<right>  | auto-highlight-symbol | next occurrence              |
+   | M-<left>   | helm                  | previous occurrence          |
+   | C-c b      | helm                  | helm-filtered-bookmarks      |
+   | C-x C-f    | helm                  | helm-find-files              |
+   | C-x f      | helm                  | helm-find-files              |
+   | C-x b      | helm                  | helm-mini                    |
+   | C-x C-b    | helm                  | helm-buffers-list            |
+   | C-h f      | helm                  | helm-apropos                 |
+   | C-h r      | helm                  | helm-info-emacs              |
+   | C-h C-l    | helm                  | helm-locate-library          |
+   | C-c f      | helm                  | helm-recentf                 |
+   | C-h SPC    | helm                  | helm-all-mark-rings          |
+   | C-c h x    | helm                  | helm-register                |
+   | M-y        | helm                  | helm-show-kill-ring          |
+   | M-x        | helm                  | helm-M-x                     |
+   | C-c C-l    | helm                  | helm-minibuffer-history      |
+   | C-s        | helm-swoop            | helm-swoop-without-pre-input |
+   | C-r        | helm-swoop            | helm-previous-line           |
+   | C-s        | helm-swoop            | helm-next-line               |
+   | M-.        | merlin                | merlin-locate                |
+   | M-,        | merlin                | merlin-pop-stack             |
+   | C-c C-o    | merlin                | merlin-occurrences           |
+   | C-c C-j    | merlin                | merlin-jump                  |
+   | C-c i      | merlin                | merlin-locate-ident          |
+   | C-c C-e    | merlin                | merlin-edit-occurrences      |
 ** main
    #+BEGIN_SRC emacs-lisp
-   (eval-when-compile
-   (require 'cl))
+   (eval-when-compile (require 'cl))
 
    (electric-pair-mode t)
 
@@ -89,6 +94,29 @@ should spit out:
    (setq ring-bell-function 'ignore)
    #+END_SRC
 
+** orgmode
+   #+BEGIN_SRC emacs-lisp
+   (use-package org
+     :ensure t
+     :defer 1
+     :mode ("\\.org\\'" . org-mode)
+     :config
+     (require 'ob-clojure)
+     (setq org-babel-clojure-backend 'cider)
+     (setq org-src-fontify-natively t)
+     (org-babel-do-load-languages
+      'org-babel-load-languages
+      '((clojure . t)
+        (lisp . t)
+	(emacs-lisp . t)
+	(haskell . t)
+	(latex . t)
+	(ledger . t)
+	(ocaml . t)
+	(python . t)
+	(sh . t)
+	(sql . t))))
+   #+END_SRC
 ** packages
    #+BEGIN_SRC emacs-lisp
    (require 'package)
