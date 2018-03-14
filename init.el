@@ -6,16 +6,88 @@
 ;; should spit out:
 ;; "/home/`user_name`/.opam/`some-version`/share/emacs/site-lisp"
 
+;;; Commentary:
+;; note:
+;; which ocamlmerlin should spit out:
+;; /home/`user_name`/.nvm/versions/node/`some-version`/bin/ocamlmerlin
+;; and in `M-x ielm` evaluating the following:
+;; (expand-file-name "emacs/site-lisp" (car (process-lines "opam" "config" "var" "share")))
+;; should spit out:
+;; "/home/`user_name`/.opam/`some-version`/share/emacs/site-lisp"
+;; remember, C-h k is how you find out what a key-chord does
+
+;; keybindings in this file:
+;; M-<right>/M-<left> -> auto-highlight-symbol -> next/previous occurrence
+;; C-c b --------------> helm ------------------> helm-filtered-bookmarks
+;; C-x C-f ------------> helm ------------------> helm-find-files
+;; C-x f --------------> helm ------------------> helm-find-files
+;; C-x b --------------> helm ------------------> helm-mini
+;; C-x C-b ------------> helm ------------------> helm-buffers-list
+;; C-h f --------------> helm ------------------> helm-apropos
+;; C-h r --------------> helm ------------------> helm-info-emacs
+;; C-h C-l ------------> helm ------------------> helm-locate-library
+;; C-c f --------------> helm ------------------> helm-recentf
+;; C-h SPC ------------> helm ------------------> helm-all-mark-rings
+;; C-c h x ------------> helm ------------------> helm-register
+;; M-y ----------------> helm ------------------> helm-show-kill-ring
+;; M-x ----------------> helm ------------------> helm-M-x
+;; C-c C-l ------------> helm ------------------> helm-minibuffer-history
+;; C-s ----------------> helm-swoop ------------> helm-swoop-without-pre-input
+;; C-r ----------------> helm-swoop ------------> helm-previous-line
+;; C-s ----------------> helm-swoop ------------> helm-next-line
+;; M-. ----------------> merlin ----------------> merlin-locate
+;; M-, ----------------> merlin ----------------> merlin-pop-stack
+;; C-c C-o ------------> merlin ----------------> merlin-occurrences
+;; C-c C-j -> merlin :: merlin-jump
+;; C-c i -> merlin :: merlin-locate-ident
+;; C-c C-e -> merlin :: merlin-iedit-occurrences))
 
 ;; main>------------------------------------------------------------------------
 (eval-when-compile
   (require 'cl))
 
+(electric-pair-mode t)
+
+(set-face-attribute 'region nil :background "green")
+
+(fset 'yes-or-no-p 'y-or-n-p)
+
+;; make elisp bearable
 (if (fboundp 'paren-set-mode)
     (paren-set-mode 'sexp)
   (defvar show-paren-style)
   (setq show-paren-style 'expression)
   (show-paren-mode t))
+(add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
+
+;; use utf-8
+(prefer-coding-system 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-language-environment "UTF-8")
+(set-default-coding-systems 'utf-8)
+(setq buffer-file-coding-system 'utf-8)
+
+;; two performance speedups
+;; https://emacs.stackexchange.com/questions/28736/emacs-pointcursor-movement-lag/28746
+(setq auto-window-vscroll nil)
+;; https://www.reddit.com/r/emacs/comments/2dgy52/how_to_stop_emacs_automatically_recentering_the/
+(setq scroll-step 1)
+
+(define-globalized-minor-mode global-goto-address-mode goto-address-mode goto-address-mode)
+(global-goto-address-mode)
+
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
+
+(setq network-security-level 'high)
+
+(global-font-lock-mode 1)
+
+;; this turns certain symbols into fonts (lambda -> λ)
+(global-prettify-symbols-mode 1)
+
+(setq frame-title-format '(buffer-file-name "%f" "%b"))
+
+(setq ring-bell-function 'ignore)
 ;; <main------------------------------------------------------------------------
 
 ;; packages>--------------------------------------------------------------------
@@ -172,13 +244,15 @@
 
 (use-package utop
   :config
+  (autoload 'utop "utop" "Toplevel for OCaml" t)
+  (autoload 'utop-minor-mode "utop" "Minor mode for utop" t)
   (defun utop-opam-utop () (progn
 			     (setq-local utop-command "opam config exec -- utop -emacs")
-			     'utop-minor-mode))
+			     utop-minor-mode))
   (defun utop-reason-cli-rtop () (progn
 				     (setq-local utop-command (concat (shell-cmd "which rtop") " -emacs"))
 				     (setq-local utop-prompt 'reason/rtop-prompt)
-				     'utop-minor-mode))
+				     utop-minor-mode))
   :hook
   (tuareg-mode . utop-opam-utop)
   (reason-mode . utop-reason-cli-rtop))
@@ -228,3 +302,17 @@
 
 
 ;; <flycheck--------------------------------------------------------------------
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   (quote
+    (flycheck-ocaml flycheck-popup-tip flycheck company-quickhelp company reason-mode tuareg helm-swoop helm exec-path-from-shell quelpa package-build use-package))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
