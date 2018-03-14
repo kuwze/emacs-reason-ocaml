@@ -1,4 +1,4 @@
-* init.el
+* init
 ** info.
 
 Hide the scroll bar.
@@ -89,10 +89,10 @@ should spit out:
    #+END_SRC
 
    two performance speedups
+   1. https://emacs.stackexchange.com/questions/28736/emacs-pointcursor-movement-lag/28746
+   2. https://www.reddit.com/r/emacs/comments/2dgy52/how_to_stop_emacs_automatically_recentering_the/
    #+BEGIN_SRC emacs-lisp
-   ;; https://emacs.stackexchange.com/questions/28736/emacs-pointcursor-movement-lag/28746
    (setq auto-window-vscroll nil)
-   ;; https://www.reddit.com/r/emacs/comments/2dgy52/how_to_stop_emacs_automatically_recentering_the/
    (setq scroll-step 1)
    #+END_SRC
    
@@ -132,13 +132,30 @@ should spit out:
    (setq ring-bell-function 'ignore)
    #+END_SRC
 
-** orgmode
+** text
+   start wrapping at 80 for text files
+   #+BEGIN_SRC emacs-lisp
+   (add-hook 'text-mode-hook
+	  '(lambda()
+	     (turn-on-auto-fill)
+	     (set-fill-column 80)
+	     (setq-default auto-fill-function 'do-auto-fill)))
+   #+END_SRC
+** org-mode
+   use sane defaults for org-mode
+   follow 80-character word-wrap rule
+   also allow for highlighting languages within org-mode using org-babel
    #+BEGIN_SRC emacs-lisp
    (use-package org
      :ensure t
      :defer 1
-     :mode ("\\.org\\'" . org-mode)
+     :mode ("\\.org\\'" . org-mode)     
      :config
+     (add-hook 'org-mode-hook
+	    '(lambda()
+	       (turn-on-auto-fill)
+	       (set-fill-column 80)
+	       (setq-default auto-fill-function 'do-auto-fill)))
      (require 'ob-clojure)
      (setq org-babel-clojure-backend 'cider)
      (setq org-src-fontify-natively t)
@@ -155,30 +172,8 @@ should spit out:
 	(sh . t)
 	(sql . t))))
    #+END_SRC
-** packages
-   #+BEGIN_SRC emacs-lisp
-   (require 'package)
-   (setq package-enable-at-startup nil)
-   (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
-			    ("marmalade" . "https://marmalade-repo.org/packages/")
-			    ("MELPA" . "https://melpa.org/packages/")
-			    ("MELPA Stable" . "http://stable.melpa.org/packages/")))
-   (package-initialize)
-
-   ;; Bootstrap `use-package'
-   (unless (package-installed-p 'use-package)
-     (package-refresh-contents)
-     (package-install 'use-package))
-
-   (if (require 'quelpa nil t)
-       (quelpa-self-upgrade)
-     (with-temp-buffer
-       (url-insert-file-contents "https://raw.github.com/quelpa/quelpa/master/bootstrap.el")
-       (eval-buffer)))
-
-   #+END_SRC 
-
 ** path
+   automatically get the path for binaries on the current system
    #+BEGIN_SRC emacs-lisp
    (if (string-equal system-type "windows-nt")
        (progn
@@ -192,8 +187,10 @@ should spit out:
 	 (when (memq window-system '(mac ns x))
 	   (exec-path-from-shell-initialize)))))
    #+END_SRC
-
+   
 ** helm
+   setup helm and make the global keybindings
+   also setup helm-swoop
    #+BEGIN_SRC emacs-lisp
    (use-package helm
      :ensure t
@@ -242,7 +239,26 @@ should spit out:
      (define-key helm-swoop-map (kbd "C-s") 'helm-next-line))
    #+END_SRC
 
+** company
+   use company-mode (not auto-complete) for text-completion
+   #+BEGIN_SRC emacs-lisp
+   (use-package company
+     :ensure t
+     :config
+     (add-hook 'prog-mode-hook 'company-mode)
+     (setq company-dabbrev-downcase 0)
+     (setq company-idle-delay 0))
+
+   (use-package company-quickhelp
+     :ensure t
+     :config
+     (company-quickhelp-mode 1)
+     (define-key company-active-map (kbd "C-c h") #'company-quickhelp-manual-begin))
+   #+END_SRC
+   
+* ml
 ** ocaml
+   remember that ocp-indent has to be installed via opam!
    #+BEGIN_SRC emacs-lisp
    (let ((opam-share (ignore-errors (car (process-lines "opam" "config" "var" "share")))))
      (when (and opam-share (file-directory-p opam-share))
@@ -262,6 +278,7 @@ should spit out:
    #+END_SRC
 
 ** reasonml
+   setup reasonml support and allow for setting merlin-commmand to the reason-cli merlin
    #+BEGIN_SRC emacs-lisp
    (defun shell-cmd (cmd)
      "Returns the stdout output of a shell command or nil if the command returned
@@ -283,6 +300,7 @@ should spit out:
    #+END_SRC
 
 ** merlin
+   setup merlin to default to opam and add hooks for reason/tuareg/caml-mode
    #+BEGIN_SRC emacs-lisp
    (use-package merlin
      :custom
@@ -304,8 +322,9 @@ should spit out:
      (tuareg-mode . merlin-mode)
      (caml-mode-hook . merlin-mode))
    #+END_SRC
-
+   
 ** utop
+   dynamically choose utop version (opam's vs reason-cli's) based on buffer
    #+BEGIN_SRC emacs-lisp
    (defun reason/rtop-prompt ()
      "The rtop prompt function."
@@ -329,26 +348,9 @@ should spit out:
      (reason-mode . utop-reason-cli-rtop))
    #+END_SRC
 
-** company
-   #+BEGIN_SRC emacs-lisp
-   (use-package company
-     :ensure t
-     :config
-     (add-hook 'after-init-hook 'global-company-mode)
-     (setq company-dabbrev-downcase 0)
-     (setq company-idle-delay 0))
-
-   (use-package company-quickhelp
-     :ensure t
-     :config
-     (company-quickhelp-mode 1)
-     (define-key company-active-map (kbd "C-c h") #'company-quickhelp-manual-begin))
-   #+END_SRC
-
 ** flycheck
+   right now flycheck-ocaml only supports ocaml, but hopefully it will be extended to reason as well
    #+BEGIN_SRC emacs-lisp
-   ;; someday these will play nicely with both reasonml and ocaml...
-
    (use-package flycheck
      :ensure t
      :config
@@ -370,5 +372,4 @@ should spit out:
 		 (flycheck-ocaml-setup))))
 
    #+END_SRC
-   <flycheck-----------------------------------------------------------------------
 
