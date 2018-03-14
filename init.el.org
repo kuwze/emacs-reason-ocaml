@@ -47,50 +47,88 @@ should spit out:
    | C-c i      | merlin                | merlin-locate-ident          |
    | C-c C-e    | merlin                | merlin-edit-occurrences      |
 ** main
+   Use Common Lisp features in Emacs Lisp.
    #+BEGIN_SRC emacs-lisp
-   (eval-when-compile (require 'cl))
+   (eval-when-compile 
+     (require 'cl)
+     (require 'cl-lib))
+   #+END_SRC
 
+   Make it so that (,{,[, and " are auto paired.
+   #+BEGIN_SRC emacs-lisp
    (electric-pair-mode t)
+   #+END_SRC
 
+   Make the highlighting/region selected easier to see.
+   #+BEGIN_SRC emacs-lisp
    (set-face-attribute 'region nil :background "green")
+   #+END_SRC
 
+   Make the default yes/no y/n instead
+   #+BEGIN_SRC emacs-lisp
    (fset 'yes-or-no-p 'y-or-n-p)
+   #+END_SRC
 
-   ;; make elisp bearable
+   make elisp bearable
+   #+BEGIN_SRC emacs-lisp
    (if (fboundp 'paren-set-mode)
        (paren-set-mode 'sexp)
      (defvar show-paren-style)
      (setq show-paren-style 'expression)
      (show-paren-mode t))
    (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
+   #+END_SRC
 
-   ;; use utf-8
+   use utf-8 everywhere!
+   #+BEGIN_SRC emacs-lisp
    (prefer-coding-system 'utf-8)
    (set-terminal-coding-system 'utf-8)
    (set-language-environment "UTF-8")
    (set-default-coding-systems 'utf-8)
    (setq buffer-file-coding-system 'utf-8)
+   #+END_SRC
 
-   ;; two performance speedups
+   two performance speedups
+   #+BEGIN_SRC emacs-lisp
    ;; https://emacs.stackexchange.com/questions/28736/emacs-pointcursor-movement-lag/28746
    (setq auto-window-vscroll nil)
    ;; https://www.reddit.com/r/emacs/comments/2dgy52/how_to_stop_emacs_automatically_recentering_the/
    (setq scroll-step 1)
-
+   #+END_SRC
+   
+   make it so that links in Emacs are clickable
+   #+BEGIN_SRC emacs-lisp
    (define-globalized-minor-mode global-goto-address-mode goto-address-mode goto-address-mode)
    (global-goto-address-mode)
+   #+END_SRC
 
+   automatically maximize the Emacs window
+   #+BEGIN_SRC emacs-lisp
    (add-to-list 'default-frame-alist '(fullscreen . maximized))
+   #+END_SRC
 
+   use secure defaults
+   #+BEGIN_SRC emacs-lisp
    (setq network-security-level 'high)
+   #+END_SRC
 
+   font-lock is enabled by default, but make sure it is globally applied
+   #+BEGIN_SRC emacs-lisp
    (global-font-lock-mode 1)
+   #+END_SRC
 
-   ;; this turns certain symbols into fonts (lambda -> λ)
+   this turns certain symbols into fonts (lambda -> λ)
+   #+BEGIN_SRC emacs-lisp
    (global-prettify-symbols-mode 1)
+   #+END_SRC
 
+   change the window title to something useful
+   #+BEGIN_SRC emacs-lisp
    (setq frame-title-format '(buffer-file-name "%f" "%b"))
-
+   #+END_SRC
+   
+   turn of the ring-bell functionality
+   #+BEGIN_SRC emacs-lisp
    (setq ring-bell-function 'ignore)
    #+END_SRC
 
