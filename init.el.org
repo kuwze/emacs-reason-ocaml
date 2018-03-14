@@ -2,13 +2,12 @@
 ** Scroll, tool and menu bar.
 
    Hide the scroll bar.
-
-   #+BEGIN_SRC emacs-lisp
-;; note:
-;; which ocamlmerlin should spit out:
-;; /home/`user_name`/.nvm/versions/node/`some-version`/bin/ocamlmerlin
-;; and in `M-x ielm` evaluating the following:
-;; (expand-file-name "emacs/site-lisp" (car (process-lines "opam" "config" "var" "share")))
+#+BEGIN_SRC emacs-lisp
+   note:
+   which ocamlmerlin should spit out:
+   /home/`user_name`/.nvm/versions/node/`some-version`/bin/ocamlmerlin
+   and in `M-x ielm` evaluating the following:
+(expand-file-name "emacs/site-lisp" (car (process-lines "opam" "config" "var" "share")))
 ;; should spit out:
 ;; "/home/`user_name`/.opam/`some-version`/share/emacs/site-lisp"
 
@@ -49,7 +48,9 @@ C-c i -> merlin :: merlin-locate-ident
 C-c C-e -> merlin :: merlin-iedit-occurrences))
    #+END_SRC
 
-   #+BEGIN_SRC emacs-lisp
+blah blah blah
+
+#+BEGIN_SRC emacs-lisp
      ;; main>------------------------------------------------------------------------
      (eval-when-compile
      (require 'cl))
