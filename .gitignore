@@ -1,5 +1,6 @@
 auto-save-list/*
 elpa/*
+init.el.el
 quelpa/*
 network-security.data
 recentf
