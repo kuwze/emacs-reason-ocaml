@@ -349,7 +349,6 @@ to use this you must:
      :custom
      (merlin-command 'opam)
      (merlin-completion-with-doc t)
-     (company-quickhelp-mode t)
      :config
      (autoload 'merlin-mode "merlin" nil t nil)
      :bind (:map merlin-mode-map
@@ -379,13 +378,13 @@ to use this you must:
      :config
      (autoload 'utop "utop" "Toplevel for OCaml" t)
      (autoload 'utop-minor-mode "utop" "Minor mode for utop" t)
-     (defun utop-opam-utop () (progn
-				(setq-local utop-command "opam config exec -- utop -emacs")
-				utop-minor-mode))
-     (defun utop-reason-cli-rtop () (progn
-					(setq-local utop-command (concat (shell-cmd "which rtop") " -emacs"))
-					(setq-local utop-prompt 'reason/rtop-prompt)
-					utop-minor-mode))
+     (defun utop-opam-utop () 
+       (setq-local utop-command "opam config exec -- utop -emacs")
+       (utop-minor-mode))
+     (defun utop-reason-cli-rtop () 
+       (setq-local utop-command (concat (shell-cmd "which rtop") " -emacs"))
+       (setq-local utop-prompt 'reason/rtop-prompt)
+       (utop-minor-mode))
      :hook
      (tuareg-mode . utop-opam-utop)
      (reason-mode . utop-reason-cli-rtop))
